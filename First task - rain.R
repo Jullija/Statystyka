@@ -112,5 +112,14 @@ boxplot(precip)
 boxplot.stats(precip)
   
   
+
+#x[1] - zwraca wektor
+#x[[1]] - zwraca pojedynczą wartość
+#x <- c(1, 2, 3)
+#x[5]
+#x[5] <- 300
+#x
+#x[[10]]
+
   
   
