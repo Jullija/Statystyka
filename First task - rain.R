@@ -28,6 +28,8 @@ for (i in 1:length(cities)){
   }
 }
 
+precip[startsWith(names(precip), "M")]
+
 
   
 #7. W których miastach opady są równe średniej?
@@ -38,6 +40,8 @@ for(i in 1:length(cities)){
     print(cities[i])
   }
 }
+
+precip[precip == round(mean(precip))]
   
 #8. W których miastach opady różnią się od mediany nie więcej niż 0.5 cala?
 cities <- names(precip)
@@ -48,6 +52,8 @@ for (i in range){ #jeśli dane są w inch. jeśli nie, to *0.4 jeszcze precip i 
     print(cities[i])
   }
 }
+
+precip[abs(precip - median(precip)) <= 0.5]
   
 #9. W którym mieście opady są najmniejsze, a w którym największe?
 sorted <- sort(precip)
@@ -63,10 +69,15 @@ ans <- 0
 
 for (i in 1:length(precip)){
   if (precip[i] > mean(precip)){
-    ans <- ans + 1
+     ans <- ans + 1
   }
 }
 ans
+
+length(precip[precip>mean(precip)])
+
+
+sum(x > mean(x))
 
 
 #11. W których miastach opady leżą powyżej górnego kwartyla?
@@ -79,6 +90,9 @@ for (i in 1:length(precip)){
   }
 }
   
+precip[precip > fivenum(precip)[4]]
+
+
 #12. W których miastach opady leżą poniżej dolnego kwartyla?
 kwartyle <- quantile(precip) #górny kwartyl to ten <= 25%
 cities <- names(precip)
@@ -88,6 +102,8 @@ for (i in 1:length(precip)){
     print(cities[i])
   }
 }  
+
+precip[precip < fivenum(precip)[2]]
 #13. Narysuj histogram rozkładu. Jakie wnioski na temat rozkładu można z niego wyciągnąć?
   hist(precip, xlab="ilość opadów", ylab="ile miast")
   
