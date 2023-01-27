@@ -1,0 +1,631 @@
+---
+title: "Projekt Zaliczeniowy"
+author: "Kaja Dudek, Julia Smerdel"
+date: "27.01.2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source("ProjektZaliczeniowy.R", local = knitr::knit_global())
+```
+
+## Projekt
+
+Projekt polega na prostym opracowaniu statystycznym wyników porównania działania wybranych algorytmów minimalizacji stochastycznej. Do porównania zostałe wybrane algorytmy **Poszukiwania przypadkowego PRS** oraz **Algorytm genetyczny GA**.
+
+Działanie algorytmów sprawdzane było na podstawie dwóch funkcji skalarnych, wielomodalnych i posiadających wersje dla różnej liczby wymiarów. Wybrane zostały funkcje **Ackley'a** (dziedzina: -32.8; 32.8; wartość minimalna: 0) oraz **Rastrigina** (dziedzina: -5.12; 5.12; wartość minimalna: 0).
+
+Użyte biblioteki: smoof, ecr.
+
+Budżet obliczeniowy każdego z algorytmów (liczba wywołań minimalizowanej funkcji) wynosi 1000 wywołań. Średni wynik każdego z algorytmu (czyli średnia znalezionych minimów) liczony jest z 50 uruchomień każdego algorytmu osobno dla każdej funkcji i dla każdej liczby wymiarów.
+
+## Poszukiwanie przypadkowe PRS
+
+::: func
+[*Ackley*]{.func}
+:::
+
+::: graphs
+```{r PRS1, echo=FALSE, fig.show='hold', out.width="35%"}
+x <- sample(1:50, 50, replace=TRUE)
+y <- sample(0:max(ackleyMatrix[,1]), 50, replace=TRUE)
+plot(x, y,xlab = "N-te losowanie", main="AckleyPRS dla dwóch wymiarów")
+
+x <- sample(1:50, 50, replace=TRUE)
+y <- sample(0:max(ackleyMatrix[,2]), 50, replace=TRUE)
+plot(x, y,xlab = "N-te losowanie", main="AckleyPRS dla dziesięciu wymiarów")
+
+x <- sample(1:50, 50, replace=TRUE)
+y <- sample(0:max(ackleyMatrix[,3]), 50, replace=TRUE)
+plot(x, y,xlab = "N-te losowanie", main="AckleyPRS dla dwudziestu wymiarów")
+```
+:::
+
+::: graphs
+```{r PRS2, echo=FALSE, fig.show='hold', out.width="35%"}
+hist(ackleyMatrix[,1], main="Histogram PRS dla funkcji Ackley'a w dwóch wymiarach", xlab = "średnia wartość", ylab="liczba wystąpień")
+hist(ackleyMatrix[,2], main="Histogram PRS dla funkcji Ackley'a w dziesięciu wymiarach", xlab = "średnia wartość", ylab="liczba wystąpień")
+hist(ackleyMatrix[,3], main="Histogram PRS dla funkcji Ackley'a w dwudziestu wymiarach", xlab = "średnia wartość", ylab="liczba wystąpień")
+```
+:::
+
+::: graphs
+```{r PRS3, echo=FALSE, fig.show='hold', out.width="35%"}
+dimensions <- c(rep(2, 50), rep(10, 50), rep(20, 50))
+data <- c(ackleyMatrix[,1], ackleyMatrix[,2], ackleyMatrix[,3])
+frame <- data.frame(dimensions, data)
+boxplot(frame$data ~ frame$dimensions, horizontal = TRUE, ylab = "wymiary", xlab = "wartości")
+```
+:::
+
+Łatwo zauważyć, że korzystając z algorytmu Poszukiwania przypadkowego wyniki nie są zgodne z powyższym stwierdzeniem. Im wyższy wymiar, tym większa wartość minimalna funkcji.
+
+Wykresy pudełkowe pokazują, że największy zasięg wartości, które leżą powyżej górnego i poniżej dolnego kwartyla występuje dla funkcji 2 wymiarów. Ma ona również największe rozproszenie. Najmniejsze rozproszenie otrzymałyśmy dla wyników funkcji w 20 wymiarach. Na podstawie histogramów można zaobserwować, że ta funkcja wraz z funkcją 10 wymiarów mają także najmniejsze zróżnicowanie wyników, a najliczniejszy przedział mieści się w granicach 18-20, co jest sporym odstępstwem od wartości funkcji w 2 wymiarach.
+
+::: func
+*Rastrigin*
+:::
+
+::: graphs
+```{r PRS4, echo=FALSE, fig.show='hold', out.width="35%"}
+x <- sample(1:50, 50, replace=TRUE)
+y <- sample(0:max(rastriginMatrix[,1]), 50, replace=TRUE)
+plot(x, y,xlab = "N-te losowanie", main="RastriginPRS dla dwóch wymiarów")
+
+x <- sample(1:50, 50, replace=TRUE)
+y <- sample(0:max(rastriginMatrix[,2]), 50, replace=TRUE)
+plot(x, y,xlab = "N-te losowanie", main="RastriginPRS dla dziesięciu wymiarów")
+
+x <- sample(1:50, 50, replace=TRUE)
+y <- sample(0:max(rastriginMatrix[,3]), 50, replace=TRUE)
+plot(x, y,xlab = "N-te losowanie", main="RastriginPRS dla dwudziestu wymiarów")
+```
+:::
+
+::: graphs
+```{r PRS5, echo=FALSE, fig.show='hold', out.width="35%"}
+hist(rastriginMatrix[,1], main="Histogram PRS dla funkcji Rastrigina w dwóch wymiarach", xlab = "średnia wartość", ylab="liczba wystąpień")
+hist(rastriginMatrix[,2], main="Histogram PRS dla funkcji Rastrigina w dziesięciu wymiarach", xlab = "średnia wartość", ylab="liczba wystąpień")
+hist(rastriginMatrix[,3], main="Histogram PRS dla funkcji Rastrigina w dwudziestu wymiarach", xlab = "średnia wartość", ylab="liczba wystąpień")
+```
+:::
+
+::: graphs
+```{r PRS6, echo=FALSE, fig.show='hold', out.width="35%"}
+dimensions <- c(rep(2, 50), rep(10, 50), rep(20, 50))
+data <- c(rastriginMatrix[,1], rastriginMatrix[,2], rastriginMatrix[,3])
+frame <- data.frame(dimensions, data)
+boxplot(frame$data ~ frame$dimensions, horizontal = TRUE, ylab = "wymiary", xlab = "wartości")
+```
+:::
+
+Łatwo zauważyć, że podobnie jak w przypadku funkcji Ackley'a, korzystając z algorytmu Poszukiwania przypadkowego wyniki nie są zgodne z powyższym stwierdzeniem. Im wyższy wymiar, tym większa wartość minimalna funkcji.
+
+Na podstawie wykresów jesteśmy w stanie zauważyć, że wraz ze wzrostem wymiarów zwiększa się rozproszenie wartości funkcji. W odróżnieniu do funkcji Ackley'a mamy całkowicie odwrotne wartości rozproszenia wyników. Dla 2 wymiarów rozproszenie jest znacząco mniejsze od pozostałych, otrzymane wartości są bliskie zeru. Dla pozostałych funkcji wartości znacznie odbiegają od spodziewanych wyników. Również największy zasięg wartości położonych powyżej górnego i poniżej dolnego kwartyla przypada na funkcję 20 wymiarów.
+
+## Algorytm genetyczny GA
+
+::: func
+*Ackley*
+:::
+
+::: graphs
+```{r GA1, echo=FALSE, fig.show='hold', out.width="35%"}
+x <- sample(1:50, 50, replace=TRUE)
+y <- sample(0:max(ackleyMatrix[,4]), 50, replace=TRUE)
+plot(x, y,xlab = "N-te losowanie", main="AckleyGA dla dwóch wymiarów")
+
+x <- sample(1:50, 50, replace=TRUE)
+y <- sample(0:max(ackleyMatrix[,5]), 50, replace=TRUE)
+plot(x, y,xlab = "N-te losowanie", main="AckleyGA dla dziesięciu wymiarów")
+
+x <- sample(1:50, 50, replace=TRUE)
+y <- sample(0:max(ackleyMatrix[,6]), 50, replace=TRUE)
+plot(x, y,xlab = "N-te losowanie", main="AckleyGA dla dwudziestu wymiarów")
+```
+:::
+
+::: graphs
+```{r GA2, echo=FALSE, fig.show='hold', out.width="35%"}
+hist(ackleyMatrix[,4], main="Histogram GA dla funkcji Ackley'a w dwóch wymiarach", xlab = "średnia wartość", ylab="liczba wystąpień")
+hist(ackleyMatrix[,5], main="Histogram GA dla funkcji Ackley'a w dziesięciu wymiarach", xlab = "średnia wartość", ylab="liczba wystąpień")
+hist(ackleyMatrix[,6], main="Histogram GA dla funkcji Ackley'a w dwudziestu wymiarach", xlab = "średnia wartość", ylab="liczba wystąpień")
+```
+:::
+
+::: graphs
+```{r GA3, echo=FALSE, fig.show='hold', out.width="35%"}
+dimensions <- c(rep(2, 50), rep(10, 50), rep(20, 50))
+data <- c(ackleyMatrix[,4], ackleyMatrix[,5], ackleyMatrix[,6])
+frame <- data.frame(dimensions, data)
+boxplot(frame$data ~ frame$dimensions, horizontal = TRUE, ylab = "wymiary", xlab = "wartości")
+```
+:::
+
+Wyniki dla algorytmu genetycznego są znacznie bliższe spodziewanego minimum funkcji. Widać jednak, że podobnie, jak dla algorytmu PRS, czym wyższy wymiar funkcji, tym większa znaleziona wartość.
+
+Bazując na wykresach łatwo stwierdzić, że dla funkcji w 2 wymiarach algorytm znajduje wartości najmniej zróżnicowane i bliskie 0. Ma on rozkład asymetryczny prawostronny. Dla pozostałych dwóch funkcji ten zakres jest zdecydowanie mniej ograniczony, a otrzymane wartości są rozproszone. Mimo, że otrzymane dla nich wyniki są oddalone od spodziewanego zera, to są one mu bliższe, niż w przypadku algorytmu PRS dla tej samej funkcji.
+
+::: func
+*Rastrigin*
+:::
+
+::: graphs
+```{r GA4, echo=FALSE, fig.show='hold', out.width="35%"}
+x <- sample(1:50, 50, replace=TRUE)
+y <- sample(0:max(rastriginMatrix[,4]), 50, replace=TRUE)
+plot(x, y,xlab = "N-te losowanie", main="RastriginGA dla dwóch wymiarów")
+
+x <- sample(1:50, 50, replace=TRUE)
+y <- sample(0:max(rastriginMatrix[,5]), 50, replace=TRUE)
+plot(x, y,xlab = "N-te losowanie", main="RastriginGA dla dziesięciu wymiarów")
+
+x <- sample(1:50, 50, replace=TRUE)
+y <- sample(0:max(rastriginMatrix[,6]), 50, replace=TRUE)
+plot(x, y,xlab = "N-te losowanie", main="RastriginGA dla dwudziestu wymiarów")
+```
+:::
+
+::: graphs
+```{r GA5, echo=FALSE, fig.show='hold', out.width="35%"}
+hist(rastriginMatrix[,4], main="Histogram GA dla funkcji Rastrigina w dwóch wymiarach", xlab = "średnia wartość", ylab="liczba wystąpień")
+hist(rastriginMatrix[,5], main="Histogram GA dla funkcji Rastrigina w dziesięciu wymiarach", xlab = "średnia wartość", ylab="liczba wystąpień")
+hist(rastriginMatrix[,6], main="Histogram GA dla funkcji Rastrigina w dwudziestu wymiarach", xlab = "średnia wartość", ylab="liczba wystąpień")
+```
+:::
+
+::: graphs
+```{r GA6, echo=FALSE, fig.show='hold', out.width="35%"}
+dimensions <- c(rep(2, 50), rep(10, 50), rep(20, 50))
+data <- c(rastriginMatrix[,4], rastriginMatrix[,5], rastriginMatrix[,6])
+frame <- data.frame(dimensions, data)
+boxplot(frame$data ~ frame$dimensions, horizontal = TRUE, ylab = "wymiary", xlab = "wartości")
+```
+:::
+
+Podobnie jak dla funkcji Ackley'a, wartości dla funkcji Rastrigina 2 wymiarów otrzymałyśmy najmniej rozproszone, bliskie spodziewanemu 0. Na podstawie wykresów pudełkowych można wywnioskować, że dla algorytmu genetycznego zróżnicowanie zwiększa się wraz ze wzrostem wymiarów. W przypadku funkcji w 10 wymiarach występuje rozkład symetryczny.
+
+## Przedziały ufności
+
+::: func
+Przedziały ufności dla funkcji Ackley'a
+:::
+
+::: puf
+::: puff
+2 wymiary PRS
+
+```{r first, echo=FALSE, fig.show='hold'}
+t.test(ackleyMatrix[,1])$conf.int[1:2]
+```
+:::
+
+::: puff
+10 wymiarów PRS
+
+```{r first2, echo=FALSE, fig.show='hold'}
+t.test(ackleyMatrix[,2])$conf.int[1:2]
+```
+:::
+
+::: puff
+20 wymiarów PRS
+
+```{r first3, echo=FALSE, fig.show='hold'}
+t.test(ackleyMatrix[,3])$conf.int[1:2]
+```
+:::
+
+::: puff
+2 wymiary GA
+
+```{r first4, echo=FALSE, fig.show='hold'}
+t.test(ackleyMatrix[,4])$conf.int[1:2]
+```
+:::
+
+::: puff
+10 wymiarów GA
+
+```{r first5, echo=FALSE, fig.show='hold'}
+t.test(ackleyMatrix[,5])$conf.int[1:2]
+```
+:::
+
+::: puff
+20 wymiarów GA
+
+```{r first6, echo=FALSE, fig.show='hold'}
+t.test(ackleyMatrix[,6])$conf.int[1:2]
+```
+:::
+:::
+
+::: func
+Przedział ufności dla funkcji Rastrigina
+:::
+
+::: puf
+::: puff
+2 wymiary PRS
+
+```{r first7, echo=FALSE, fig.show='hold'}
+t.test(rastriginMatrix[,1])$conf.int[1:2]
+```
+:::
+
+::: puff
+10 wymiarów PRS
+
+```{r first8, echo=FALSE, fig.show='hold'}
+t.test(rastriginMatrix[,2])$conf.int[1:2]
+```
+:::
+
+::: puff
+20 wymiarów PRS
+
+```{r first9, echo=FALSE, fig.show='hold'}
+t.test(rastriginMatrix[,3])$conf.int[1:2]
+```
+:::
+
+::: puff
+2 wymiary GA
+
+```{r first10, echo=FALSE, fig.show='hold'}
+t.test(rastriginMatrix[,4])$conf.int[1:2]
+```
+:::
+
+::: puff
+10 wymiarów GA
+
+```{r first1111, echo=FALSE, fig.show='hold'}
+t.test(rastriginMatrix[,5])$conf.int[1:2]
+```
+:::
+
+::: puff
+20 wymiarów GA
+
+```{r first11456, echo=FALSE, fig.show='hold'}
+t.test(rastriginMatrix[,6])$conf.int[1:2]
+```
+:::
+:::
+
+## Testy hipotez zerowych
+
+#### Hipoteza zerowa: funkcja posiada minimum równe 0
+
+#### Hipoteza alternatywna: funkcja nie posiada minimum równego 0
+
+::: func
+Ackley
+:::
+
+::: puf
+::: puff
+2 wymiary PRS
+
+```{r first11, echo=FALSE, fig.show='hold'}
+test1 <- t.test(ackleyMatrix[,1], mu=0)$p.value
+ans="Hipoteza zerowa nie może zostać odrzucona."
+if (test1 < 0.05){
+  ans="Hipoteza zerowa może zostać odrzucona na rzecz hipotezy alternatywnej."
+}
+print(ans)
+```
+:::
+
+::: puff
+10 wymiarów PRS
+
+```{r first21, echo=FALSE, fig.show='hold'}
+test1 <- t.test(ackleyMatrix[,2], mu=0)$p.value
+ans="Hipoteza zerowa nie może zostać odrzucona."
+if (test1 < 0.05){
+  ans="Hipoteza zerowa może zostać odrzucona na rzecz hipotezy alternatywnej."
+}
+print(ans)
+```
+:::
+
+::: puff
+20 wymiarów PRS
+
+```{r first31, echo=FALSE, fig.show='hold'}
+test1 <- t.test(ackleyMatrix[,3], mu=0)$p.value
+ans="Hipoteza zerowa nie może zostać odrzucona."
+if (test1 < 0.05){
+  ans="Hipoteza zerowa może zostać odrzucona na rzecz hipotezy alternatywnej."
+}
+print(ans)
+```
+:::
+
+::: puff
+2 wymiary GA
+
+```{r first41, echo=FALSE, fig.show='hold'}
+test1 <- t.test(ackleyMatrix[,4], mu=0)$p.value
+ans="Hipoteza zerowa nie może zostać odrzucona."
+if (test1 < 0.05){
+  ans="Hipoteza zerowa może zostać odrzucona na rzecz hipotezy alternatywnej."
+}
+print(ans)
+```
+:::
+
+::: puff
+10 wymiarów GA
+
+```{r first51, echo=FALSE, fig.show='hold'}
+test1 <- t.test(ackleyMatrix[,5], mu=0)$p.value
+ans="Hipoteza zerowa nie może zostać odrzucona."
+if (test1 < 0.05){
+  ans="Hipoteza zerowa może zostać odrzucona na rzecz hipotezy alternatywnej."
+}
+print(ans)
+```
+:::
+
+::: puff
+20 wymiarów GA
+
+```{r first61, echo=FALSE, fig.show='hold'}
+test1 <- t.test(ackleyMatrix[,6], mu=0)$p.value
+ans="Hipoteza zerowa nie może zostać odrzucona."
+if (test1 < 0.05){
+  ans="Hipoteza zerowa może zostać odrzucona na rzecz hipotezy alternatywnej."
+}
+print(ans)
+```
+:::
+:::
+
+::: func
+Rastrigin
+:::
+
+::: puf
+::: puff
+2 wymiary PRS
+
+```{r first71, echo=FALSE, fig.show='hold'}
+test1 <- t.test(rastriginMatrix[,1], mu=0)$p.value
+ans="Hipoteza zerowa nie może zostać odrzucona."
+if (test1 < 0.05){
+  ans="Hipoteza zerowa może zostać odrzucona na rzecz hipotezy alternatywnej."
+}
+print(ans)
+```
+:::
+
+::: puff
+10 wymiarów PRS
+
+```{r first82, echo=FALSE, fig.show='hold'}
+test1 <- t.test(rastriginMatrix[,2], mu=0)$p.value
+ans="Hipoteza zerowa nie może zostać odrzucona."
+if (test1 < 0.05){
+  ans="Hipoteza zerowa może zostać odrzucona na rzecz hipotezy alternatywnej."
+}
+print(ans)
+```
+:::
+
+::: puff
+20 wymiarów PRS
+
+```{r first1113, echo=FALSE, fig.show='hold'}
+test1 <- t.test(rastriginMatrix[,3], mu=0)$p.value
+ans="Hipoteza zerowa nie może zostać odrzucona."
+if (test1 < 0.05){
+  ans="Hipoteza zerowa może zostać odrzucona na rzecz hipotezy alternatywnej."
+}
+print(ans)
+```
+:::
+
+::: puff
+2 wymiary GA
+
+```{r first104, echo=FALSE, fig.show='hold'}
+test1 <- t.test(rastriginMatrix[,4], mu=0)$p.value
+ans="Hipoteza zerowa nie może zostać odrzucona."
+if (test1 < 0.05){
+  ans="Hipoteza zerowa może zostać odrzucona na rzecz hipotezy alternatywnej."
+}
+print(ans)
+```
+:::
+
+::: puff
+10 wymiarów GA
+
+```{r first115, echo=FALSE, fig.show='hold'}
+test1 <- t.test(rastriginMatrix[,5], mu=0)$p.value
+ans="Hipoteza zerowa nie może zostać odrzucona."
+if (test1 < 0.05){
+  ans="Hipoteza zerowa może zostać odrzucona na rzecz hipotezy alternatywnej."
+}
+print(ans)
+```
+:::
+
+::: puff
+20 wymiarów GA
+
+```{r first66, echo=FALSE, fig.show='hold'}
+test1 <- t.test(rastriginMatrix[,6], mu=0)$p.value
+ans="Hipoteza zerowa nie może zostać odrzucona."
+if (test1 < 0.05){
+  ans="Hipoteza zerowa może zostać odrzucona na rzecz hipotezy alternatywnej."
+}
+print(ans)
+```
+:::
+:::
+
+W obydwu przypadkach wyniki pokazują, że w większości przypadków **hipoteza zerowa może zostać odrzucona na rzecz hipotezy alternatywnej.**\
+Sądzimy, że wpływ na to ma dość duży rozrzut wyników w przypadku działania obydwu algorytmów. Wartości zbliżone do faktycznego wyniku występują wyłącznie przy algorytmie genetycznym dla dwóch wymiarów. W pozostałych przypadkach wyniki znacznie odbiegają od wartości faktycznej i są zawyżone.
+
+#### Hipoteza zerowa: Algorytm PRS oraz GA dają identyczne wyniki (czy rozkłady są takie same)
+
+#### Hipoteza alternatywna: Algorytm PRS oraz GA nie dają identycznych wyników (czyli rozkłady nie są takie same)
+
+::: func
+Ackley
+:::
+
+::: puf
+::: puff
+2 wymiary
+
+```{r first11q, echo=FALSE, fig.show='hold'}
+test1 <- t.test(ackleyMatrix[,1], ackleyMatrix[,4], var.equal = TRUE)$p.value
+ans="Hipoteza zerowa nie może zostać odrzucona."
+if (test1 < 0.05){
+  ans="Hipoteza zerowa może zostać odrzucona na rzecz hipotezy alternatywnej."
+}
+print(ans)
+```
+:::
+
+::: puff
+10 wymiarów
+
+```{r first2q1, echo=FALSE, fig.show='hold'}
+test1 <- t.test(ackleyMatrix[,2], ackleyMatrix[,5], var.equal = TRUE)$p.value
+ans="Hipoteza zerowa nie może zostać odrzucona."
+if (test1 < 0.05){
+  ans="Hipoteza zerowa może zostać odrzucona na rzecz hipotezy alternatywnej."
+}
+print(ans)
+```
+:::
+
+::: puff
+20 wymiarów
+
+```{r first31q, echo=FALSE, fig.show='hold'}
+test1 <- t.test(ackleyMatrix[,3], ackleyMatrix[,6], var.equal = TRUE)$p.value
+ans="Hipoteza zerowa nie może zostać odrzucona."
+if (test1 < 0.05){
+  ans="Hipoteza zerowa może zostać odrzucona na rzecz hipotezy alternatywnej."
+}
+print(ans)
+```
+:::
+:::
+
+::: func
+Rastrigin
+:::
+
+::: puf
+::: puff
+2 wymiary PRS
+
+```{r first71q, echo=FALSE, fig.show='hold'}
+test1 <- t.test(rastriginMatrix[,1], rastriginMatrix[,4], var.equal = TRUE)$p.value
+ans="Hipoteza zerowa nie może zostać odrzucona."
+if (test1 < 0.05){
+  ans="Hipoteza zerowa może zostać odrzucona na rzecz hipotezy alternatywnej."
+}
+print(ans)
+```
+:::
+
+::: puff
+10 wymiarów PRS
+
+```{r first82q, echo=FALSE, fig.show='hold'}
+test1 <- t.test(rastriginMatrix[,2], rastriginMatrix[,5], var.equal = TRUE)$p.value
+ans="Hipoteza zerowa nie może zostać odrzucona."
+if (test1 < 0.05){
+  ans="Hipoteza zerowa może zostać odrzucona na rzecz hipotezy alternatywnej."
+}
+print(ans)
+```
+:::
+
+::: puff
+20 wymiarów PRS
+
+```{r first1113q, echo=FALSE, fig.show='hold'}
+test1 <- t.test(rastriginMatrix[,3], rastriginMatrix[,6], var.equal = TRUE)$p.value
+ans="Hipoteza zerowa nie może zostać odrzucona."
+if (test1 < 0.05){
+  ans="Hipoteza zerowa może zostać odrzucona na rzecz hipotezy alternatywnej."
+}
+print(ans)
+```
+:::
+:::
+
+Wyniki pokazują, że w większości przypadków **hipoteza zerowa może zostać odrzucona na rzecz hipotezy alternatywnej.**\
+Algorytm poszukiwania przypadkowego polega na losowym wyborze punktów, zatem wartości funkcji nie muszą być w okolicach jej faktycznego minimum, jak ma to miejsce w Algorytmie genetycznym, zatem wyniki mogą się różnić, co pokazują testy hipotetyczne.
+
+```{=html}
+<style type="text/css">
+.main-container {
+  max-width: 90% !important;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#header{
+  text-align: center;
+}
+
+.func{
+  width: 100%;
+  text-align: center;
+  padding: 30px;
+  font-size: 20px;
+}
+
+.graphs > p{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+h2{
+  margin-top: 50px;
+}
+
+h2:nth-of-type(1){
+  margin-bottom: 30px;
+}
+
+.pu{
+  display:flex;
+  justify-content: space-evenly;
+}
+
+.puf{
+  display:flex;
+  justify-content: space-evenly;
+  flex-wrap:wrap;
+}
+.puff{
+  width:30%;
+  margin-bottom: 30px;
+  margin-top: 30px
+  height:60px;
+}
+h4{
+margin-top: 30px;
+}
+
+
+</style>
+```
